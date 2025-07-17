@@ -1,63 +1,55 @@
-class Itinerary {
+class TripPlan {
   final String title;
   final String startDate;
   final String endDate;
-  final List<ItineraryDay> days;
+  final List<TripDay> days;
 
-  Itinerary({
+  TripPlan({
     required this.title,
     required this.startDate,
     required this.endDate,
     required this.days,
   });
 
-  factory Itinerary.fromJson(Map<String, dynamic> json) {
-    return Itinerary(
+  factory TripPlan.fromJson(Map<String, dynamic> json) {
+    return TripPlan(
       title: json['title'],
       startDate: json['startDate'],
       endDate: json['endDate'],
-      days: (json['days'] as List)
-          .map((e) => ItineraryDay.fromJson(e))
-          .toList(),
+      days: (json['days'] as List).map((e) => TripDay.fromJson(e)).toList(),
     );
   }
 }
 
-class ItineraryDay {
+class TripDay {
   final String date;
   final String summary;
-  final List<ItineraryItem> items;
+  final List<TripItem> items;
 
-  ItineraryDay({
-    required this.date,
-    required this.summary,
-    required this.items,
-  });
+  TripDay({required this.date, required this.summary, required this.items});
 
-  factory ItineraryDay.fromJson(Map<String, dynamic> json) {
-    return ItineraryDay(
+  factory TripDay.fromJson(Map<String, dynamic> json) {
+    return TripDay(
       date: json['date'],
       summary: json['summary'],
-      items: (json['items'] as List)
-          .map((e) => ItineraryItem.fromJson(e))
-          .toList(),
+      items: (json['items'] as List).map((e) => TripItem.fromJson(e)).toList(),
     );
   }
 }
 
-class ItineraryItem {
+class TripItem {
   final String time;
   final String activity;
   final String location;
 
-  ItineraryItem({
+  TripItem({
     required this.time,
     required this.activity,
     required this.location,
   });
 
-  factory ItineraryItem.fromJson(Map<String, dynamic> json) {
-    return ItineraryItem(
+  factory TripItem.fromJson(Map<String, dynamic> json) {
+    return TripItem(
       time: json['time'],
       activity: json['activity'],
       location: json['location'],
