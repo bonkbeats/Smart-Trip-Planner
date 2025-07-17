@@ -51,7 +51,7 @@ $userPrompt
 
       final reply = await callGeminiAPI(prompt);
 
-      print("🌐 Gemini Raw Reply:\n$reply");
+      // print("🌐 Gemini Raw Reply:\n$reply");
 
       // Try extracting JSON from messy replies
       final jsonStart = reply.indexOf('{');
@@ -63,7 +63,7 @@ $userPrompt
       final cleanJsonString = reply.substring(jsonStart, jsonEnd + 1);
       final decodedJson = jsonDecode(cleanJsonString);
 
-      print("✅ Decoded JSON: $decodedJson");
+      // print("✅ Decoded JSON: $decodedJson");
 
       final tripPlan = TripPlan.fromJson(decodedJson);
 
@@ -71,7 +71,7 @@ $userPrompt
       ref.read(tripPlanProvider.notifier).state = tripPlan;
     } catch (e, st) {
       ref.read(errorProvider.notifier).state = 'Something went wrong: $e';
-      print('❌ Error: $e\n$st');
+      // print('❌ Error: $e\n$st');
     } finally {
       ref.read(loadingProvider.notifier).state = false;
       ref.read(loadscreenProvider.notifier).state = false;

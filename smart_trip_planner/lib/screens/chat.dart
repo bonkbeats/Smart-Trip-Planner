@@ -1,8 +1,9 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:smart_trip_planner/model/model.dart';
+
 import 'package:smart_trip_planner/reiverpod.dart/gemini_reiverprovider.dart';
+
+import 'package:smart_trip_planner/utils/maps.dart';
 
 class ChatScreen extends ConsumerWidget {
   const ChatScreen({super.key});
@@ -11,10 +12,8 @@ class ChatScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final inputText = ref.watch(inputTextProvider);
     final loading = ref.watch(loadingProvider);
-    final reply = ref.watch(replyProvider);
     final controller = TextEditingController();
-    final tripPlan = ref.watch(tripPlanProvider); // ✅ Use this instead
-    print("Gemini reply:\n$reply");
+    final tripPlan = ref.watch(tripPlanProvider);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -68,7 +67,19 @@ class ChatScreen extends ConsumerWidget {
                               child: ListView.builder(
                                 itemCount: tripPlan.days.length,
                                 itemBuilder: (context, index) {
-                                  final day = tripPlan!.days[index];
+                                  final day = tripPlan.days[index];
+                                  final coordinates = day.items
+                                      .map((item) => item.location)
+                                      .where(
+                                        (loc) =>
+                                            loc.contains(',') &&
+                                            double.tryParse(
+                                                  loc.split(',').first,
+                                                ) !=
+                                                null,
+                                      )
+                                      .toList();
+
                                   return Card(
                                     elevation: 3,
                                     margin: const EdgeInsets.symmetric(
@@ -83,22 +94,67 @@ class ChatScreen extends ConsumerWidget {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Text(
-                                            "Date: ${day.date}",
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 16,
-                                            ),
+                                          // Row with date and map icon
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                "Date: ${day.date}",
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                              if (coordinates.length >= 2)
+                                                IconButton(
+                                                  icon: const Icon(
+                                                    Icons.map_outlined,
+                                                    color: Colors.teal,
+                                                  ),
+                                                  tooltip: "View route on map",
+                                                  onPressed: () {
+                                                    final mapUrl =
+                                                        "https://www.google.com/maps/dir/?api=1&travelmode=walking&waypoints=${coordinates.join('|')}";
+                                                    openMapUrl(mapUrl);
+                                                  },
+                                                ),
+                                            ],
                                           ),
                                           Text(day.summary),
                                           const SizedBox(height: 8),
                                           ...day.items.map((item) {
-                                            return Padding(
-                                              padding: const EdgeInsets.only(
-                                                bottom: 6,
-                                              ),
-                                              child: Text(
-                                                "• ${item.time} - ${item.activity} (${item.location})",
+                                            return GestureDetector(
+                                              onTap: () {
+                                                openMap(item.location);
+                                              },
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                  bottom: 6,
+                                                ),
+                                                child: Row(
+                                                  children: [
+                                                    const Icon(
+                                                      Icons
+                                                          .location_on_outlined,
+                                                      size: 18,
+                                                      color: Colors.teal,
+                                                    ),
+                                                    const SizedBox(width: 6),
+                                                    Expanded(
+                                                      child: Text(
+                                                        "${item.time} - ${item.activity}",
+                                                        style: const TextStyle(
+                                                          fontSize: 14,
+                                                          color: Colors.blue,
+                                                          decoration:
+                                                              TextDecoration
+                                                                  .underline,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             );
                                           }).toList(),
