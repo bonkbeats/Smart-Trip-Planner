@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:smart_trip_planner/model/model.dart';
 
 Future<String> callGeminiAPI(String prompt) async {
   final apiKey = dotenv.env['GEMINI_API_KEY'];
@@ -26,6 +27,7 @@ Future<String> callGeminiAPI(String prompt) async {
 
   if (response.statusCode == 200) {
     final data = jsonDecode(response.body);
+
     return data['candidates'][0]['content']['parts'][0]['text'];
   } else {
     throw Exception('Failed to call Gemini API: ${response.body}');
