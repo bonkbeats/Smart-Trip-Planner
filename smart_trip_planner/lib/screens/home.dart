@@ -74,7 +74,7 @@ class VisionScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-              const Spacer(),
+
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(

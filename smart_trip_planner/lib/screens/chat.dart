@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:smart_trip_planner/isar/isar_trip_service.dart';
 
 import 'package:smart_trip_planner/reiverpod.dart/gemini_reiverprovider.dart';
-
 import 'package:smart_trip_planner/utils/maps.dart';
+import 'package:smart_trip_planner/model/model.dart'; // ✅ your app-level model
 
 class ChatScreen extends ConsumerWidget {
   const ChatScreen({super.key});
@@ -94,7 +95,6 @@ class ChatScreen extends ConsumerWidget {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          // Row with date and map icon
                                           Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
@@ -182,6 +182,27 @@ class ChatScreen extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
+
+                  // ✅ Save Button with conversion
+                  IconButton(
+                    icon: const Icon(Icons.save, color: Colors.green),
+                    tooltip: "Save Trip Plan",
+                    onPressed: () async {
+                      if (tripPlan != null) {
+                        await saveTripPlanToIsar(
+                          tripPlan,
+                        ); // handles conversion internally
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Trip plan saved to local storage!'),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+
+                  const SizedBox(width: 4),
+
                   loading
                       ? const CircularProgressIndicator()
                       : IconButton(

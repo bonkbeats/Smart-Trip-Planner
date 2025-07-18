@@ -63,7 +63,7 @@ $userPrompt
       final cleanJsonString = reply.substring(jsonStart, jsonEnd + 1);
       final decodedJson = jsonDecode(cleanJsonString);
 
-      // print("✅ Decoded JSON: $decodedJson");
+      print("✅ Decoded JSON: $decodedJson");
 
       final tripPlan = TripPlan.fromJson(decodedJson);
 
