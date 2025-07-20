@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:smart_trip_planner/isar/isar_trip_service.dart';
 import 'package:smart_trip_planner/reiverpod.dart/gemini_reiverprovider.dart';
-
 import 'package:smart_trip_planner/utils/maps.dart';
+import 'package:smart_trip_planner/model/model.dart';
 
 class ChatScreen extends ConsumerWidget {
   const ChatScreen({super.key});
@@ -21,13 +21,16 @@ class ChatScreen extends ConsumerWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.teal),
-                onPressed: () => Navigator.pop(context),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.teal),
+                  onPressed: () => Navigator.pop(context),
+                ),
               ),
               const SizedBox(height: 8),
+
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.all(16),
@@ -39,137 +42,159 @@ class ChatScreen extends ConsumerWidget {
                       ? const Center(child: CircularProgressIndicator())
                       : tripPlan == null
                       ? const Text("No valid data available.")
-                      : Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'You:\n$inputText\n',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
+                      : SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Card(
+                                color: Colors.teal.shade50,
+                                elevation: 2,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Text(
+                                    'You:\n$inputText\n',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
-                            const Divider(),
-                            Text(
-                              tripPlan.title,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                              Card(
+                                elevation: 4,
+                                margin: const EdgeInsets.symmetric(vertical: 8),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        tripPlan.title,
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        "From ${tripPlan.startDate} to ${tripPlan.endDate}",
+                                        style: const TextStyle(fontSize: 14),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              "From ${tripPlan.startDate} to ${tripPlan.endDate}",
-                              style: const TextStyle(fontSize: 14),
-                            ),
-                            const SizedBox(height: 8),
-                            Expanded(
-                              child: ListView.builder(
-                                itemCount: tripPlan.days.length,
-                                itemBuilder: (context, index) {
-                                  final day = tripPlan.days[index];
-                                  final coordinates = day.items
-                                      .map((item) => item.location)
-                                      .where(
-                                        (loc) =>
-                                            loc.contains(',') &&
-                                            double.tryParse(
-                                                  loc.split(',').first,
-                                                ) !=
-                                                null,
-                                      )
-                                      .toList();
+                              const SizedBox(height: 8),
+                              ...tripPlan.days.map((day) {
+                                final coordinates = day.items
+                                    .map((item) => item.location)
+                                    .where(
+                                      (loc) =>
+                                          loc.contains(',') &&
+                                          double.tryParse(
+                                                loc.split(',').first,
+                                              ) !=
+                                              null,
+                                    )
+                                    .toList();
 
-                                  return Card(
-                                    elevation: 3,
-                                    margin: const EdgeInsets.symmetric(
-                                      vertical: 8,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(16),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          // Row with date and map icon
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                "Date: ${day.date}",
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 16,
-                                                ),
+                                return Card(
+                                  elevation: 3,
+                                  margin: const EdgeInsets.symmetric(
+                                    vertical: 8,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              "Date: ${day.date}",
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
                                               ),
-                                              if (coordinates.length >= 2)
-                                                IconButton(
-                                                  icon: const Icon(
-                                                    Icons.map_outlined,
+                                            ),
+                                            if (coordinates.length >= 2)
+                                              IconButton(
+                                                icon: const Icon(
+                                                  Icons.map_outlined,
+                                                  color: Colors.teal,
+                                                ),
+                                                tooltip: "View route on map",
+                                                onPressed: () {
+                                                  final mapUrl =
+                                                      "https://www.google.com/maps/dir/?api=1&travelmode=walking&waypoints=${coordinates.join('|')}";
+                                                  openMapUrl(mapUrl);
+                                                },
+                                              ),
+                                          ],
+                                        ),
+                                        Text(day.summary),
+                                        const SizedBox(height: 8),
+                                        ...day.items.map((item) {
+                                          return GestureDetector(
+                                            onTap: () {
+                                              openMap(item.location);
+                                            },
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                bottom: 6,
+                                              ),
+                                              child: Row(
+                                                children: [
+                                                  const Icon(
+                                                    Icons.location_on_outlined,
+                                                    size: 18,
                                                     color: Colors.teal,
                                                   ),
-                                                  tooltip: "View route on map",
-                                                  onPressed: () {
-                                                    final mapUrl =
-                                                        "https://www.google.com/maps/dir/?api=1&travelmode=walking&waypoints=${coordinates.join('|')}";
-                                                    openMapUrl(mapUrl);
-                                                  },
-                                                ),
-                                            ],
-                                          ),
-                                          Text(day.summary),
-                                          const SizedBox(height: 8),
-                                          ...day.items.map((item) {
-                                            return GestureDetector(
-                                              onTap: () {
-                                                openMap(item.location);
-                                              },
-                                              child: Padding(
-                                                padding: const EdgeInsets.only(
-                                                  bottom: 6,
-                                                ),
-                                                child: Row(
-                                                  children: [
-                                                    const Icon(
-                                                      Icons
-                                                          .location_on_outlined,
-                                                      size: 18,
-                                                      color: Colors.teal,
-                                                    ),
-                                                    const SizedBox(width: 6),
-                                                    Expanded(
-                                                      child: Text(
-                                                        "${item.time} - ${item.activity}",
-                                                        style: const TextStyle(
-                                                          fontSize: 14,
-                                                          color: Colors.blue,
-                                                          decoration:
-                                                              TextDecoration
-                                                                  .underline,
-                                                        ),
+                                                  const SizedBox(width: 6),
+                                                  Expanded(
+                                                    child: Text(
+                                                      "${item.time} - ${item.activity}",
+                                                      style: const TextStyle(
+                                                        fontSize: 14,
+                                                        color: Colors.blue,
+                                                        decoration:
+                                                            TextDecoration
+                                                                .underline,
                                                       ),
                                                     ),
-                                                  ],
-                                                ),
+                                                  ),
+                                                ],
                                               ),
-                                            );
-                                          }).toList(),
-                                        ],
-                                      ),
+                                            ),
+                                          );
+                                        }).toList(),
+                                      ],
                                     ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
+                                  ),
+                                );
+                              }).toList(),
+                            ],
+                          ),
                         ),
                 ),
               ),
+
               const SizedBox(height: 16),
+
+              // Bottom input row
               Row(
                 children: [
                   Expanded(
@@ -182,6 +207,23 @@ class ChatScreen extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
+                  IconButton(
+                    icon: const Icon(Icons.save, color: Colors.green),
+                    tooltip: "Save Trip Plan",
+                    onPressed: () async {
+                      ref.read(isFollowUpProvider.notifier).state = true;
+
+                      if (tripPlan != null) {
+                        await saveTripPlanToIsar(tripPlan);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Trip plan saved to local storage!'),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                  const SizedBox(width: 4),
                   loading
                       ? const CircularProgressIndicator()
                       : IconButton(
@@ -191,6 +233,11 @@ class ChatScreen extends ConsumerWidget {
                             if (newInput.isNotEmpty) {
                               ref.read(inputTextProvider.notifier).state =
                                   newInput;
+
+                              // 👇 Mark this as a follow-up
+                              ref.read(isFollowUpProvider.notifier).state =
+                                  true;
+
                               controller.clear();
                               await ref.read(generateItineraryProvider)();
                             }
