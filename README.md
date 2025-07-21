@@ -38,6 +38,26 @@ flutter build apk --debug
 To build a release APK:
 flutter build apk --release
 
+
+🔍 Step 1: Query Understanding & Retrieval (Pinecone)
+User enters a travel query (e.g., "plan a 3-day trip to Manali").
+The query is converted into a vector embedding.
+That vector is sent to Pinecone to check if a similar query was answered earlier:
+If similarity ≥ 0.95 → Return saved itinerary directly (cached result).
+If similarity between 0.90–0.95 → Use as context to generate better response.
+Else → Go to Gemini for fresh response.
+
+🤖 Step 2: Response Generation (Gemini API)
+If no matching result is found in Pinecone:
+The query (and optionally a similar context) is sent to the Gemini AI model.
+Gemini returns a structured JSON itinerary.
+This response is parsed, displayed in chat UI, and stored for reuse.
+
+📦 Step 3: Save for Future Reuse (Pinecone + Isar)
+The final prompt-response pair is:
+Saved in Pinecone with its embedding for future similarity matches.
+Saved locally using Isar for offline access and chat history.
+
 Create a `.env` file in the project root and add the following keys:
 
 ```env
@@ -56,4 +76,4 @@ Hugging Face: https://huggingface.co/settings/tokens
 
 https://lucid.app/lucidchart/4ab0090f-6443-4a60-9487-accab97c986f/edit?viewport_loc=-2692%2C-3751%2C16354%2C7723%2C0_0&invitationId=inv_3c73feb3-cbf9-4e32-876f-73a50c4b80fd
 
-![alt text](pic-1.png)
+
