@@ -4,7 +4,6 @@ import 'package:smart_trip_planner/LLM/gemini.dart';
 import 'package:smart_trip_planner/model/model.dart';
 import 'package:smart_trip_planner/pinecone_service/pine_service.dart';
 
-// Input, status, and response providers
 final inputTextProvider = StateProvider<String>((ref) => '');
 final loadingProvider = StateProvider<bool>((ref) => false);
 final replyProvider = StateProvider<String>((ref) => '');
@@ -13,7 +12,6 @@ final errorProvider = StateProvider<String?>((ref) => null);
 final isFollowUpProvider = StateProvider<bool>((ref) => false);
 final tripPlanProvider = StateProvider<TripPlan?>((ref) => null);
 
-// Provider that handles the trip plan generation
 final generateItineraryProvider = Provider((ref) {
   return () async {
     ref.read(loadingProvider.notifier).state = true;
@@ -48,12 +46,16 @@ Format your response strictly as JSON in the following schema:
 }
 ''';
 
-      // Only use Pinecone for the **initial** (non-follow-up) query
       if (!isFollowUp) {
-        final similarResponses = await getTopMatches(userPrompt);
+        final matches = await getTopEmbeddingMatchesWithScore(userPrompt);
 
-        for (final reusedReply in similarResponses) {
-          if (reusedReply.contains('{')) {
+        if (matches.isNotEmpty) {
+          final reusedReply = matches.first['text'];
+          final score = matches.first['score'];
+
+          print('🔍 Top match score: $score');
+
+          if (score >= 0.95) {
             final jsonStart = reusedReply.indexOf('{');
             final jsonEnd = reusedReply.lastIndexOf('}');
             if (jsonStart != -1 && jsonEnd > jsonStart) {
@@ -63,27 +65,20 @@ Format your response strictly as JSON in the following schema:
 
               ref.read(replyProvider.notifier).state = reusedReply;
               ref.read(tripPlanProvider.notifier).state = tripPlan;
-              print("✅ Reused high-score Pinecone match.");
+              print("✅ Reused response (score ≥ 0.95)");
               return;
             }
-          }
-        }
-
-        if (similarResponses.isNotEmpty) {
-          prompt += "\nHere are some similar past trip plans:\n";
-          for (var i = 0; i < similarResponses.length; i++) {
-            prompt += "Plan ${i + 1}:\n${similarResponses[i]}\n\n";
+          } else if (score >= 0.90) {
+            prompt += "\nHere is a similar past plan:\n$reusedReply\n";
           }
         }
 
         prompt += "\nUser says:\n$userPrompt";
       } else {
-        // For follow-ups, use only previous reply as context
         prompt += "\nPrevious plan:\n$previousReply\n\nUser says:\n$userPrompt";
       }
 
       print("📤 Prompt sent to Gemini:\n$prompt");
-
       final reply = await callGeminiAPI(prompt);
       print("🤖 Gemini reply:\n$reply");
 
@@ -100,7 +95,6 @@ Format your response strictly as JSON in the following schema:
       ref.read(replyProvider.notifier).state = reply;
       ref.read(tripPlanProvider.notifier).state = tripPlan;
 
-      // Save to Pinecone only for non-follow-up prompts
       if (!isFollowUp) {
         await saveContextToPinecone(userPrompt, reply);
         print("✅ Saved to Pinecone");

@@ -46,51 +46,61 @@ class ChatScreen extends ConsumerWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Card(
-                                color: Colors.teal.shade50,
-                                elevation: 2,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: Text(
-                                    'You:\n$inputText\n',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
+                              SizedBox(
+                                width: double.infinity,
+                                child: Card(
+                                  color: Colors.teal.shade50,
+                                  elevation: 2,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Text(
+                                      'You:\n$inputText\n',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                              Card(
-                                elevation: 4,
-                                margin: const EdgeInsets.symmetric(vertical: 8),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        tripPlan.title,
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
+
+                              SizedBox(
+                                width: double.infinity,
+                                child: Card(
+                                  elevation: 4,
+                                  margin: const EdgeInsets.symmetric(
+                                    vertical: 8,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          tripPlan.title,
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        "From ${tripPlan.startDate} to ${tripPlan.endDate}",
-                                        style: const TextStyle(fontSize: 14),
-                                      ),
-                                    ],
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          "From ${tripPlan.startDate} to ${tripPlan.endDate}",
+                                          style: const TextStyle(fontSize: 14),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
+
                               const SizedBox(height: 8),
                               ...tripPlan.days.map((day) {
                                 final coordinates = day.items
@@ -130,19 +140,19 @@ class ChatScreen extends ConsumerWidget {
                                                 fontSize: 16,
                                               ),
                                             ),
-                                            if (coordinates.length >= 2)
-                                              IconButton(
-                                                icon: const Icon(
-                                                  Icons.map_outlined,
-                                                  color: Colors.teal,
-                                                ),
-                                                tooltip: "View route on map",
-                                                onPressed: () {
-                                                  final mapUrl =
-                                                      "https://www.google.com/maps/dir/?api=1&travelmode=walking&waypoints=${coordinates.join('|')}";
-                                                  openMapUrl(mapUrl);
-                                                },
-                                              ),
+                                            // if (coordinates.length >= 2)
+                                            //   IconButton(
+                                            //     icon: const Icon(
+                                            //       Icons.map_outlined,
+                                            //       color: Colors.teal,
+                                            //     ),
+                                            //     tooltip: "View route on map",
+                                            //     onPressed: () {
+                                            //       final mapUrl =
+                                            //           "https://www.google.com/maps/dir/?api=1&travelmode=walking&waypoints=${coordinates.join('|')}";
+                                            //       openMapUrl(mapUrl);
+                                            //     },
+                                            //   ),
                                           ],
                                         ),
                                         Text(day.summary),
@@ -169,10 +179,10 @@ class ChatScreen extends ConsumerWidget {
                                                       "${item.time} - ${item.activity}",
                                                       style: const TextStyle(
                                                         fontSize: 14,
-                                                        color: Colors.blue,
+                                                        color: Colors
+                                                            .black87, // or Colors.black
                                                         decoration:
-                                                            TextDecoration
-                                                                .underline,
+                                                            TextDecoration.none,
                                                       ),
                                                     ),
                                                   ),
@@ -212,7 +222,6 @@ class ChatScreen extends ConsumerWidget {
                     tooltip: "Save Trip Plan",
                     onPressed: () async {
                       ref.read(isFollowUpProvider.notifier).state = true;
-
                       if (tripPlan != null) {
                         await saveTripPlanToIsar(tripPlan);
                         ScaffoldMessenger.of(context).showSnackBar(

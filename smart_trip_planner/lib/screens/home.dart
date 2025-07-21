@@ -39,29 +39,10 @@ class _VisionScreenState extends ConsumerState<VisionScreen> {
             children: [
               const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: 'Hey Shubham ',
-                          style: TextStyle(
-                            color: Colors.teal,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        WidgetSpan(
-                          child: Text('👋', style: TextStyle(fontSize: 20)),
-                        ),
+                children: [Text.rich(TextSpan(children: [
+                       
                       ],
-                    ),
-                  ),
-                  CircleAvatar(
-                    backgroundColor: Colors.teal,
-                    child: Text('S', style: TextStyle(color: Colors.white)),
-                  ),
-                ],
+                    ))],
               ),
               const SizedBox(height: 32),
               const Text(
@@ -103,10 +84,9 @@ class _VisionScreenState extends ConsumerState<VisionScreen> {
                     ),
                   ),
                   onPressed: () {
-                    final previousReply = ref.read(replyProvider);
-                    final isFollowUp = previousReply.isNotEmpty;
-
-                    ref.read(isFollowUpProvider.notifier).state = isFollowUp;
+                    // final previousReply = ref.read(replyProvider);
+                    // final isFollowUp = previousReply.isNotEmpty;
+                    ref.read(isFollowUpProvider.notifier).state = false;
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (_) => const ChatScreen()),

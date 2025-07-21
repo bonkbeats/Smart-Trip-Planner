@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.example.smart_trip_planner"
-    compileSdk = flutter.compileSdkVersion
+     compileSdk = 35  // ⬅️ Updated from 33 to 35
     ndkVersion = "27.0.12077973"
 
 
@@ -25,8 +25,8 @@ android {
         applicationId = "com.example.smart_trip_planner"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        minSdk = 21 // ⬅️ Reasonable minimum for most apps
+        targetSdk = 35 // ⬅️ Matches compileSdk
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
