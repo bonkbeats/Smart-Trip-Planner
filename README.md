@@ -65,7 +65,7 @@ GEMINI_API_KEY=your_gemini_api_key_here
 PINECONE_API_KEY=your_pinecone_api_key_here
 PINECONE_ENV=your_pinecone_env
 PINECONE_INDEX_NAME=your_index_name
-PINECONE_URI=https://trip-ntfbatu.svc.aped-4627-b74a.pinecone.io //model for vector embedding
+PINECONE_URI=your_pinecone_host
 HF_API_KEY=your_huggingface_api_key_here
 
 💡 Note: These keys are required for the app to function. You can generate them from the following platforms:
